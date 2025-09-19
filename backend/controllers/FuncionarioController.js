@@ -1,7 +1,7 @@
-const { Usuario, Endereco } = require("../models");
+const { Usuario, Funcionario } = require("../models");
 const { Op } = require("sequelize");
 
-const UsuarioController = {
+const FuncionarioController = {
   async index(req, res) {
     const { query, sort, nome } = req.query;
     const page = req.query.page || 1;
@@ -22,11 +22,11 @@ const UsuarioController = {
       };
     }
     res.json(
-      await Usuario.findAll({
+      await Funcionario.findAll({
         include: [
           {
-            model: Endereco,
-            attributes: ["bairro", "municipio"],
+            model: Usuario,
+            attributes: { exclude: ["enderecoId"] },
           },
         ],
         where,
@@ -40,18 +40,18 @@ const UsuarioController = {
   async show(req, res) {
     const { id } = req.params;
 
-    const user = await Usuario.findByPk(id);
+    const user = await Funcionario.findByPk(id);
     if (user) {
       return res.json(user);
     }
-    return res.status(401).json({ erro: "Usuário não encontrado" });
+    return res.status(401).json({ erro: "Funcionário não encontrado" });
   },
 
   async create(req, res) {
     const usuario = req.body;
     try {
-      await Usuario.create(usuario);
-      return res.json({ mensagem: "Usuário criado com sucesso" });
+      await Funcionario.create(usuario);
+      return res.json({ mensagem: "Funcionário criado com sucesso" });
     } catch (error) {
       return res.json({ erro: "Não foi possível criar" });
     }
@@ -60,9 +60,12 @@ const UsuarioController = {
   async update(req, res) {
     const { id } = req.params;
     try {
-      const usuario = await Usuario.findByPk(id);
+      const usuario = await Funcionario.findByPk(id);
       usuario.update(req.body);
-      return res.json({ mensagem: "usuario atualizado com sucesso", usuario });
+      return res.json({
+        mensagem: "Funcionário atualizado com sucesso",
+        usuario,
+      });
     } catch (error) {
       return res.json({ erro: "Não foi possível atualizar" });
     }
@@ -71,12 +74,12 @@ const UsuarioController = {
   async destroy(req, res) {
     const { id } = req.params;
     try {
-      (await Usuario.findByPk(id)).destroy();
-      return res.json({ mensagem: "Usuário deletado com sucesso" });
+      (await Funcionario.findByPk(id)).destroy();
+      return res.json({ mensagem: "Funcionário deletado com sucesso" });
     } catch (error) {
       return res.json({ erro: "Não foi possível eliminar" });
     }
   },
 };
 
-module.exports = UsuarioController;
+module.exports = FuncionarioController;

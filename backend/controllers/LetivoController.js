@@ -1,9 +1,9 @@
-const { Usuario, Endereco } = require("../models");
+const { Turma, Letivo } = require("../models");
 const { Op } = require("sequelize");
 
-const UsuarioController = {
+const LetivoController = {
   async index(req, res) {
-    const { query, sort, nome } = req.query;
+    const { query, sort, dtInicio, dtFim } = req.query;
     const page = req.query.page || 1;
     const limit = req.query.limit || 25;
     let where = {};
@@ -13,20 +13,20 @@ const UsuarioController = {
       order = sort.split(";").split(":");
     }
 
-    if (nome) {
+    if (dtInicio && dtFim) {
       where = {
         ...where,
-        nome: {
-          [Op.like]: nome,
+        dtInicio: {
+          [Op.between]: [dtInicio, dtFim],
         },
       };
     }
     res.json(
-      await Usuario.findAll({
+      await Letivo.findAll({
         include: [
           {
-            model: Endereco,
-            attributes: ["bairro", "municipio"],
+            model: Turma,
+            required: false,
           },
         ],
         where,
@@ -40,18 +40,18 @@ const UsuarioController = {
   async show(req, res) {
     const { id } = req.params;
 
-    const user = await Usuario.findByPk(id);
+    const user = await Letivo.findByPk(id);
     if (user) {
       return res.json(user);
     }
-    return res.status(401).json({ erro: "Usuário não encontrado" });
+    return res.status(401).json({ erro: "Ano-letivo não encontrado" });
   },
 
   async create(req, res) {
     const usuario = req.body;
     try {
-      await Usuario.create(usuario);
-      return res.json({ mensagem: "Usuário criado com sucesso" });
+      await Letivo.create(usuario);
+      return res.json({ mensagem: "Ano-letivo criado com sucesso" });
     } catch (error) {
       return res.json({ erro: "Não foi possível criar" });
     }
@@ -60,9 +60,12 @@ const UsuarioController = {
   async update(req, res) {
     const { id } = req.params;
     try {
-      const usuario = await Usuario.findByPk(id);
+      const usuario = await Letivo.findByPk(id);
       usuario.update(req.body);
-      return res.json({ mensagem: "usuario atualizado com sucesso", usuario });
+      return res.json({
+        mensagem: "Ano-letivo atualizado com sucesso",
+        usuario,
+      });
     } catch (error) {
       return res.json({ erro: "Não foi possível atualizar" });
     }
@@ -71,12 +74,12 @@ const UsuarioController = {
   async destroy(req, res) {
     const { id } = req.params;
     try {
-      (await Usuario.findByPk(id)).destroy();
-      return res.json({ mensagem: "Usuário deletado com sucesso" });
+      (await Letivo.findByPk(id)).destroy();
+      return res.json({ mensagem: "Ano-letivo deletado com sucesso" });
     } catch (error) {
       return res.json({ erro: "Não foi possível eliminar" });
     }
   },
 };
 
-module.exports = UsuarioController;
+module.exports = LetivoController;

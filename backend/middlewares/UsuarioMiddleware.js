@@ -1,7 +1,7 @@
 const Yup = require("yup");
+const bcrypt = require("bcryptjs");
 
 module.exports = {
-  
   async validateUser(req, res, next) {
     const schema = Yup.object().shape({
       nome: Yup.string().required(),
@@ -11,15 +11,18 @@ module.exports = {
       telefone: Yup.string().min(9).max(13),
       status: Yup.string().required(),
       dtNascimento: Yup.date().required(),
+      pass: Yup.string().min(8).required(),
     });
 
     if (await schema.isValid(req.body)) {
+      /* SE VALIDAR TODOS OS CAMPOS, CRIPTOGRAFE A SENHA */
+      req.body["password"] = await bcrypt.hash(req.body.pass, 8);
       return next();
     }
 
     return res.status(300).json({ erro: "Preencha corretamente os campos" });
   },
-  
+
   async validateUpdate(req, res, next) {
     const schema = Yup.object().shape({
       nome: Yup.string(),
@@ -36,5 +39,5 @@ module.exports = {
     }
 
     return res.status(300).json({ erro: "Preencha corretamente os campos" });
-  }
+  },
 };

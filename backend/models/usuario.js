@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+const bcrypt = require("bcryptjs");
 module.exports = (sequelize, DataTypes) => {
   class Usuario extends Model {
     /**
@@ -10,7 +11,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Endereco);
-      this.hasMany(models.Funcionario)
+      this.hasMany(models.Funcionario);
+    }
+
+    checkpassword(pass) {
+      return bcrypt.compare(pass, this.password);
     }
   }
   Usuario.init(
@@ -23,11 +28,19 @@ module.exports = (sequelize, DataTypes) => {
       status: DataTypes.STRING,
       dtNascimento: DataTypes.DATE,
       enderecoId: DataTypes.INTEGER,
+      password: DataTypes.STRING,
+      pass: DataTypes.VIRTUAL,
     },
     {
       sequelize,
       modelName: "Usuario",
     }
   );
+  /* Usuario.addHook("beforeSave", async (user) => {
+    if (user.password) {
+      user.password = await bcrypt.hash(user.pass, 8);
+    }
+  }); */
+
   return Usuario;
 };

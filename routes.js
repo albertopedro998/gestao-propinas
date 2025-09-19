@@ -57,16 +57,8 @@ router.delete("/funcionarios/:id", Funcionario.destroy);
 //ROTAS PARA ALUNOS
 router.get("/alunos", Aluno.index);
 router.get("/alunos/:id", Aluno.show);
-router.post(
-  "/alunos",
-  AlunoMiddleware.validateCreate,
-  Aluno.create
-);
-router.put(
-  "/alunos/:id",
-  AlunoMiddleware.validateUpdate,
-  Aluno.update
-);
+router.post("/alunos", AlunoMiddleware.validateCreate, Aluno.create);
+router.put("/alunos/:id", AlunoMiddleware.validateUpdate, Aluno.update);
 router.delete("/alunos/:id", Aluno.destroy);
 
 //ROTAS PARA ANO-LETIVO
@@ -86,8 +78,16 @@ router.delete("/propinas/:id", Propina.destroy);
 //ROTAS PARA PAGAMENTOS
 router.get("/pagamentos", Pagamento.index);
 router.get("/pagamentos/:id", Pagamento.show);
-router.post("/pagamentos", PagamentoMiddleware.validateCreate, Pagamento.create);
-router.put("/pagamentos/:id", PagamentoMiddleware.validateUpdate, Pagamento.update);
+router.post(
+  "/pagamentos",
+  PagamentoMiddleware.validateCreate,
+  Pagamento.create
+);
+router.put(
+  "/pagamentos/:id",
+  PagamentoMiddleware.validateUpdate,
+  Pagamento.update
+);
 router.delete("/pagamentos/:id", Pagamento.destroy);
 
 //ROTAS PARA TURMAS
